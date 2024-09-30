@@ -52,7 +52,6 @@ def whatsapp_compatibility(contact):
     }
     try:
         response = session.get(url,params=querystring)
-        logging.info(response.text)
         result=response.json()
         if result['status']=='valid':
             return True
@@ -84,6 +83,7 @@ def check_contact(row):
             compatible=whatsapp_compatibility(contact)
             if compatible:
                 whatsapp_contact_list.append(contact)
+                logging.info(contact)
             elif compatible==False:
                 non_whatsapp_contact_list.append(contact)
             else:
@@ -96,6 +96,7 @@ def check_contact(row):
             compatible=whatsapp_compatibility(cc_contact)
             if compatible:
                 whatsapp_contact_list.append(cc_contact)
+                logging.info(cc_contact)
             elif compatible==False:
                 non_whatsapp_contact_list.append(cc_contact)
             else:
@@ -120,14 +121,21 @@ def check_contact(row):
             json.dump(data, file,indent=4)
 
 task_live=False
-path = 'sajgane.xlsx' 
-df = pd.read_excel(path)
+sajgane_df = pd.read_excel('sajgane.xlsx')
+rohan_df = pd.read_excel('rohan.xlsx')
+mahendra_df = pd.read_excel('mahendra.xlsx')
 
+current_df=''
 def flask_background_task():
-    global task_live
+    global task_live,current_df
     task_live=True
-    df.apply(check_contact, axis=1)
-    logging.info("Task Completed")
+    current_df='sajgane_df'
+    sajgane_df.apply(check_contact, axis=1)
+    current_df='rohan_df'
+    rohan_df.apply(check_contact, axis=1)
+    current_df='mahendra_df'
+    mahendra_df.apply(check_contact, axis=1)
+    logging.info("task_completed")
     task_live=False
 
 app = Flask(__name__)
@@ -147,7 +155,7 @@ def root():
     # }
     # with open('output.json', 'w') as file:
     #     json.dump(data, file,indent=4)
-    return jsonify({'message': 'ok'}), 200
+    return jsonify({'DataFrame': current_df}), 200
 
 @app.route('/health', methods=['GET'])
 def health():
