@@ -152,6 +152,21 @@ def root():
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'message': 'ok'}), 200
+
+@app.route('/get_data', methods=['GET'])
+def get_data():
+    whatsapp=list(set(whatsapp_contact_list))
+    non_whatsapp=list(set(non_whatsapp_contact_list))
+    data = {
+            'man_khatav': {
+                'fail_contacts':list(set(fail_contacts)),
+                'valid_contacts': len(whatsapp),
+                'invalid_contacts': len(non_whatsapp),
+                'whatsapp_contacts':whatsapp,
+                'non_whatsapp_contacts':non_whatsapp,
+                }
+        }
+    return jsonify(data), 200
     
 @app.route('/check_number', methods=['GET'])
 def check_number():
