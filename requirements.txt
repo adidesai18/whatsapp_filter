@@ -1,0 +1,5 @@
+python-dotenv
+firebase_admin
+flask
+requests
+pandas
